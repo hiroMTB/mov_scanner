@@ -51,5 +51,6 @@ oF_v083/scripts/*
 oF_v083/libs/*
 oF_v083/other/*
 oF_v083/apps/myApps/*
+package/*
 changes.txt
 license.md
