@@ -29,7 +29,7 @@ void ofApp::setup(){
 	bHorizon = true;
     bSendOsc = true;
     bSendMidi = false;
-    bUseMov = false;
+    bUseMov = true;
     
     indicator = 0;
     indicator_speed = 1;
