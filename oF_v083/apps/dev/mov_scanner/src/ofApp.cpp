@@ -39,10 +39,14 @@ void ofApp::setup(){
     mov_num = 0;
     selected_mov = 0;
     
+    disp_offset.set(20, 20);
+    
     ofSetWindowPosition(0, 0);
 	ofBackground( 0, 0, 0 );
     ofSetFrameRate( 60 );
 
+    ofShowCursor();
+    
     mov_num = mov_dir.listDir("movies");
     if( bUseMov ){
         // Load Movie
@@ -86,7 +90,7 @@ void ofApp::setup(){
 	osc_s.setup(address, 12345);
     
     // prepare dot scan point
-    dot_scan_points.push_back( dot_scan_point( 300, 300) );
+    dot_scan_points.push_back( dot_scan_point(300, 300) );
 }
 
 void ofApp::update(){
@@ -113,10 +117,75 @@ void ofApp::update(){
         mov.update();
         dot_scan();
     }
+    
+
 }
 
 void ofApp::dot_scan(){
+    bundle.clear();
     
+    for (int i=0; i<dot_scan_points.size(); i++) {
+        
+        int index = 0;
+        unsigned char * pixels;
+
+        // capture position
+        int col = dot_scan_points[i].pos.x;
+        int row = dot_scan_points[i].pos.y;
+        
+        if( bUseMov ){
+            mov_w = mov.getWidth();
+            mov_h = mov.getHeight();
+            if( 0<=col && col<mov_w ){
+                if( 0<=row && row<=mov_h){
+                    index = mov.getPixelsRef().getPixelIndex( col, row );
+                    pixels = mov.getPixels();
+                }else{
+                    continue;
+                }
+            }else{
+                continue;
+            }
+        }else{
+            mov_w = img.getWidth();
+            mov_h = img.getHeight();
+            if( 0<=col && col<mov_w ){
+                if( 0<=row && row<=mov_h){
+                    index = img.getPixelsRef().getPixelIndex( col, row );
+                    pixels = img.getPixels();
+                }else{
+                    continue;
+                }
+            }else{
+                continue;
+            }
+        }
+        
+        unsigned char r = pixels[ index ];
+        unsigned char g = pixels[ index ];
+        unsigned char b = pixels[ index ];
+
+        int val_i = (r+g+b)/3.0;
+        float val =  (float)val_i / 255.0;
+        
+        bool on = val>noise_threashold;
+        if( on ){
+            if( bSendMidi ){
+                int cc_value = val * 127.0;
+                midi_out.sendControlChange( i+1, 102, cc_value );
+            }
+            
+            if( bSendOsc ){
+                ofxOscMessage m;
+                m.setAddress( "/" + ofToString(i) );
+                m.addIntArg( val_i );
+                bundle.addMessage( m );
+            }
+         }
+    }
+    
+    if(bSendOsc)
+        osc_s.sendBundle(bundle);
 }
 
 void ofApp::line_scan(){
@@ -156,7 +225,7 @@ void ofApp::line_scan(){
             float val = ( (float)val_i / 255.0f );
             if (val>noise_threashold) {
                 dot_pos.push_back( ofVec2f( i, j ) );
-                dot_col.push_back( ofFloatColor( 1, 1, 1, val) );
+                dot_col.push_back( ofFloatColor( 0.3, 0.3, 1, val) );
             }
         }
     }
@@ -229,10 +298,10 @@ void ofApp::draw(){
     ofPushMatrix();{
         
         if(bHorizon){
-            ofTranslate(20, 20);
+            ofTranslate( disp_offset );
         }else{
             ofRotate(90, 0, 0, 1);
-            ofTranslate(20, -mov_h - 20);
+            ofTranslate( disp_offset.y, -mov_h - disp_offset.x );
         }
             
         draw_mov();
@@ -242,15 +311,17 @@ void ofApp::draw(){
         }else{
             draw_dot_scan();
         }
-
-        draw_info();
     }ofPopMatrix();
     
+	draw_info();
     
+    /*
+     draw mouse
     mouseX = ofGetMouseX();
     mouseY = ofGetMouseY();
     ofCircle(mouseX, mouseY, 3, 3);
-    ofDrawBitmapString(ofToString(mouseX) + "," + ofToString(mouseY), mouseX+25, mouseY-25 );
+    ofDrawBitmapString(ofToString(mouseX) + "," + ofToString(mouseY), mouseX+20, mouseY-25 );
+     */
 }
 
 void ofApp::draw_mov(){
@@ -267,7 +338,7 @@ void ofApp::draw_mov(){
 void ofApp::draw_dot_scan(){
     
     for (int i=0; i<dot_scan_points.size(); i++) {
-        dot_scan_points[i].draw();
+        dot_scan_points[i].draw( i );
     }
 }
 
@@ -337,16 +408,28 @@ void ofApp::change_mov(){
 }
 
 void ofApp::mousePressed( int x, int y, int button ){
+    if( !bUseLineScan ){
+        ofVec2f wpos = screen2world( ofVec2f(x, y) );
+        for (int i=0; i<dot_scan_points.size(); i++) {
+            dot_scan_points[i].pressed( wpos.x, wpos.y, button );
+        }
+    }
 }
 
 void ofApp::mouseReleased( int x, int y, int button ){
-    
+    if( !bUseLineScan ){
+        ofVec2f wpos = screen2world( ofVec2f(x, y) );
+        for (int i=0; i<dot_scan_points.size(); i++) {
+            dot_scan_points[i].released( wpos.x, wpos.y, button );
+        }
+    }
 }
 
 void ofApp::mouseDragged( int x, int y, int button ){
     if( !bUseLineScan ){
+        ofVec2f wpos = screen2world( ofVec2f(x, y) );
         for (int i=0; i<dot_scan_points.size(); i++) {
-            dot_scan_points[i].touch( x, y, button );
+            dot_scan_points[i].dragged( wpos.x, wpos.y, button );
         }
     }
 }
@@ -395,6 +478,9 @@ void ofApp::keyPressed( int key ){
             bUseLineScan = !bUseLineScan;
             break;
             
+        case 'A':
+            dot_scan_points.push_back( dot_scan_point( ofRandom(0, mov_w), ofRandom(0, mov_h)) );
+            break;
 		default:
             break;
     }
@@ -415,4 +501,64 @@ void ofApp::windowResized( int w, int h ){
 
 void ofApp::exit(){
     midi_out.closePort();
+}
+
+ofVec2f ofApp::screen2world( ofVec2f screen ){
+    
+    ofVec2f w;
+    
+    if( bHorizon ){
+        w.x = screen.x-disp_offset.x;
+        w.y = screen.y-disp_offset.y;
+    }else{
+ 
+        /* 
+         *   draw(){
+         *       ofRotate(90, 0, 0, 1);
+         *       ofTranslate( disp_offset.y, -mov_h - disp_offset.x );
+         *   }
+         */
+        
+        /*
+         *  NOTICE: ofTranslate() is already under effect of rotate right before!!
+         */
+        ofVec2f trans( disp_offset.y, -mov_h-disp_offset.x );
+        trans.rotate(90);
+        w = screen - trans;
+        w = w.rotate( -90 );
+    }
+    
+    return w;
+}
+
+ofVec2f ofApp::world2screen( ofVec2f world ){
+    
+    ofVec2f s;
+
+    if( bHorizon ){
+        s.x = world.x+disp_offset.x;
+        s.y = world.y+disp_offset.y;
+    }else{
+        ofVec2f wr = world.rotated( 90 );
+        ofVec2f trans( disp_offset.y, -mov_h-disp_offset.x );
+        trans.rotate(90);
+        s = wr + trans;
+    }
+    return s;
+}
+
+void ofApp::test_convert_position(){
+    {
+        ofVec2f w( 100, 100 );
+        ofVec2f s = world2screen( w );
+        ofVec2f w2 = screen2world( s );
+        cout << "1:   " << w.x << ", " << w.y << "   " << w2.x << ", " << w2.y << endl;
+    }
+     
+    {
+         ofVec2f s( 100, 100 );
+         ofVec2f w = screen2world( s );
+         ofVec2f s2 = world2screen( w );
+         cout << "2:   " << s.x << ", " << s.y << "   " << s2.x << ", " << s2.y << endl;
+    }
 }

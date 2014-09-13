@@ -31,6 +31,10 @@ public:
     
     void set_window_size();
     void change_mov();
+    void test_convert_position();
+    
+    ofVec2f screen2world( ofVec2f screen );
+    ofVec2f world2screen( ofVec2f world );
     
     bool bHorizon;
 	bool bShowMov;
@@ -73,4 +77,6 @@ public:
     ofDirectory mov_dir;
     
     vector<dot_scan_point> dot_scan_points;
+
+    ofVec2f disp_offset;
 };
