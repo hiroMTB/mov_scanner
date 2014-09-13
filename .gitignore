@@ -56,3 +56,7 @@ oF_v083/apps/myApps/*
 package/*
 changes.txt
 license.md
+
+#cubase
+,bak
+.peak
