@@ -177,7 +177,7 @@ void ofApp::dot_scan(){
             
             if( bSendOsc ){
                 ofxOscMessage m;
-                m.setAddress( "/" + ofToString(i) );
+                m.setAddress( "/" + ofToString(i+1) );
                 m.addIntArg( val_i );
                 bundle.addMessage( m );
             }

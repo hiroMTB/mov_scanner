@@ -10,7 +10,8 @@ DO NOT use subdirectory
 	x      /data/movies/big/abc.mov
 
 
-Keyboard control
+Keyboard control{
+
 d 			change direction of movie
 LR arrow		change threshold
 Shift + LR arrow	change indicator speed
@@ -18,5 +19,43 @@ Shift + LR arrow	change indicator speed
 m			show/hide movie
 space			stop movie
 
+!New!
+#			switch dot/line scan
+A			add dot scan point
 
-Update	rev1.2	28.8.2014
+}
+
+Mode
+
+Osc global setting{
+	out ip address	localhost
+	out port	12345
+}
+
+line scan mode
+{
+	osc format
+	message		/ch/id value	
+	ch range	1 ~ 8
+	id range	1 ~ 10
+	value range	0 ~ 255
+
+	midi format
+	midi ch range	1 ~ 32
+	cc range 	102 ~ 112
+	value		0 ~ 255
+}
+
+
+dot scan mode{
+	message		/ch value
+	ch range	1 ~ …
+	value range	0 ~ 255
+
+	midi format
+	midi ch range	1 ~ …
+	cc range 	102
+	value		0 ~ 255
+}
+
+Update	rev1.3	14.9.2014
