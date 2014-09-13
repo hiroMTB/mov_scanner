@@ -704,6 +704,7 @@
 					src,
 					"../../../addons/ofxOsc/**",
 				);
+				ICON_FILE_PATH = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D__MACOSX_CORE__",
@@ -729,6 +730,9 @@
 				GCC_MODEL_TUNING = NONE;
 				ICON = "$(ICON_NAME_DEBUG)";
 				ICON_FILE = "$(ICON_FILE_PATH)$(ICON)";
+				ICON_FILE_PATH = "$(OF_PATH)/libs/openFrameworksCompiled/project/osx/";
+				ICON_NAME_DEBUG = "icon-debug.icns";
+				ICON_NAME_RELEASE = icon.icns;
 				INFOPLIST_FILE = "openFrameworks-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
@@ -814,6 +818,9 @@
 				GCC_MODEL_TUNING = NONE;
 				ICON = "$(ICON_NAME_RELEASE)";
 				ICON_FILE = "$(ICON_FILE_PATH)$(ICON)";
+				ICON_FILE_PATH = "$(OF_PATH)/libs/openFrameworksCompiled/project/osx/";
+				ICON_NAME_DEBUG = "icon-debug.icns";
+				ICON_NAME_RELEASE = icon.icns;
 				INFOPLIST_FILE = "openFrameworks-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
@@ -880,7 +887,7 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_50)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_51)",
 				);
-				PRODUCT_NAME = mov_scanner;
+				PRODUCT_NAME = ap;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

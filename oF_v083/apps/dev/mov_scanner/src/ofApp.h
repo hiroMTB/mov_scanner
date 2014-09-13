@@ -3,26 +3,8 @@
 #include "ofMain.h"
 #include "ofQTKitPlayer.h"
 
-#define SEND_OSC 1
-#ifdef SEND_OSC
 #include "ofxOsc.h"
-#endif
-
-//#define SEND_MIDI 1
-#ifdef SEND_MIDI
 #include "ofxMidi.h"
-#endif
-
-class nr_track{
-    
-public:
-    nr_track();
-    int prm_num;
-    bool on;
-    vector<float> prm;
-
-    int current_note;
-};
 
 class ofApp : public ofBaseApp {
 
@@ -42,6 +24,7 @@ public:
     
     bool bHorizon;
 	bool bShowMov;
+    bool bUseMov;
     
     int track_num;
     int mov_num;
@@ -50,11 +33,15 @@ public:
     int mov_h;
     int indicator;
     int indicator_speed;
-    float noise_threashold;
-    
-	nr_track * tracks;
+    int prm_num;
 
+    float noise_threashold;
+
+    // mov
     ofQTKitPlayer mov;
+    
+    // img
+    ofImage img;
 
     // vbo draw
     ofVbo dot_vbo;
@@ -66,15 +53,12 @@ public:
     vector<ofFloatColor> line_col;
     
     // output
-
-#ifdef SEND_OSC
+    bool bSendOsc, bSendMidi;
 	ofxOscSender osc_s;
-#endif
-
-#ifdef SEND_MIDI
     ofxMidiOut midi_out;
-#endif
-	
+	ofxOscBundle bundle;
+    
+    
     // mov dir
     ofDirectory mov_dir;
 };
