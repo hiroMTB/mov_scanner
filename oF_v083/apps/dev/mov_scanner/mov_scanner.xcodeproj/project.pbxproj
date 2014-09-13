@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4D9BAE1C19C4CD4800E4F702 /* dot_scan_point.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9BAE1A19C4CD4800E4F702 /* dot_scan_point.cpp */; };
 		4DB4D2CA19A23023006AFAC1 /* RtMidi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB4D29919A22F0E006AFAC1 /* RtMidi.cpp */; };
 		4DB4D2CB19A23023006AFAC1 /* ofxRtMidiIn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB4D2A619A22F0E006AFAC1 /* ofxRtMidiIn.cpp */; };
 		4DB4D2CC19A23023006AFAC1 /* ofxRtMidiOut.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB4D2A819A22F0E006AFAC1 /* ofxRtMidiOut.cpp */; };
@@ -80,6 +81,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4D9BAE1A19C4CD4800E4F702 /* dot_scan_point.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dot_scan_point.cpp; sourceTree = "<group>"; };
+		4D9BAE1B19C4CD4800E4F702 /* dot_scan_point.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dot_scan_point.h; sourceTree = "<group>"; };
+		4D9BAE1F19C4D6C200E4F702 /* ofx2DCamera.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofx2DCamera.cpp; sourceTree = "<group>"; };
+		4D9BAE2019C4D6C200E4F702 /* ofx2DCamera.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofx2DCamera.h; sourceTree = "<group>"; };
 		4DB4D28D19A22F0E006AFAC1 /* iOSVersionDetection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iOSVersionDetection.h; sourceTree = "<group>"; };
 		4DB4D28E19A22F0E006AFAC1 /* PGArc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PGArc.h; sourceTree = "<group>"; };
 		4DB4D28F19A22F0E006AFAC1 /* PGMidi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PGMidi.h; sourceTree = "<group>"; };
@@ -211,6 +216,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4D9BAE1D19C4D6C200E4F702 /* ofx2DCamera */ = {
+			isa = PBXGroup;
+			children = (
+				4D9BAE1E19C4D6C200E4F702 /* src */,
+			);
+			name = ofx2DCamera;
+			path = ../../../addons/ofx2DCamera;
+			sourceTree = "<group>";
+		};
+		4D9BAE1E19C4D6C200E4F702 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				4D9BAE1F19C4D6C200E4F702 /* ofx2DCamera.cpp */,
+				4D9BAE2019C4D6C200E4F702 /* ofx2DCamera.h */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
 		4DB4D24919A22F0D006AFAC1 /* ofxMidi */ = {
 			isa = PBXGroup;
 			children = (
@@ -329,6 +352,7 @@
 		BB4B014C10F69532006C3DED /* addons */ = {
 			isa = PBXGroup;
 			children = (
+				4D9BAE1D19C4D6C200E4F702 /* ofx2DCamera */,
 				F651A76319AA3AFD007A48FC /* ofxOsc */,
 				4DB4D24919A22F0D006AFAC1 /* ofxMidi */,
 			);
@@ -401,6 +425,8 @@
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
 				E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */,
+				4D9BAE1A19C4CD4800E4F702 /* dot_scan_point.cpp */,
+				4D9BAE1B19C4CD4800E4F702 /* dot_scan_point.h */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;
@@ -621,6 +647,7 @@
 				F651A79419AA3B92007A48FC /* OscTypes.cpp in Sources */,
 				4DB4D2CA19A23023006AFAC1 /* RtMidi.cpp in Sources */,
 				4DB4D2CB19A23023006AFAC1 /* ofxRtMidiIn.cpp in Sources */,
+				4D9BAE1C19C4CD4800E4F702 /* dot_scan_point.cpp in Sources */,
 				4DB4D2CC19A23023006AFAC1 /* ofxRtMidiOut.cpp in Sources */,
 				4DB4D2CD19A23023006AFAC1 /* ofxBaseMidi.cpp in Sources */,
 				4DB4D2CE19A23023006AFAC1 /* ofxMidi.cpp in Sources */,

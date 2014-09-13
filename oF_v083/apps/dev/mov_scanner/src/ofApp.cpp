@@ -23,13 +23,13 @@
  *
  */
 
-
 void ofApp::setup(){
-    bShowMov = false;
-	bHorizon = true;
+    bShowMov = true;
+	bHorizon = false;
     bSendOsc = true;
     bSendMidi = false;
     bUseMov = true;
+    bUseLineScan = false;
     
     indicator = 0;
     indicator_speed = 1;
@@ -53,10 +53,9 @@ void ofApp::setup(){
             change_mov();
         }
     }else{
-        bool ok = img.loadImage("img/skymap_1.png");
+        bool ok = img.loadImage("images/skymap_1.png");
         if(!ok) ofExit();
     }
-    
     
     set_window_size();
     
@@ -78,7 +77,6 @@ void ofApp::setup(){
     line_vbo.setVertexData( &line_pos[0], line_pos.size(), GL_DYNAMIC_DRAW );
     line_vbo.setColorData( &line_col[0], line_col.size(), GL_DYNAMIC_DRAW );
     
-    
     // midi
     midi_out.listPorts();
     midi_out.openVirtualPort( "from_mov_scanner" );
@@ -86,6 +84,9 @@ void ofApp::setup(){
 	// osc
 	string address = "localhost";
 	osc_s.setup(address, 12345);
+    
+    // prepare dot scan point
+    dot_scan_points.push_back( dot_scan_point( 300, 300) );
 }
 
 void ofApp::update(){
@@ -98,19 +99,27 @@ void ofApp::update(){
         mov_h = img.getHeight();
     }
     
-    indicator += indicator_speed;
-    indicator %= (int)mov_w;
-    
-    if( indicator_speed!=0 && indicator/indicator_speed ){
-        int over = indicator%indicator_speed;
-        indicator -= over;
+    if( bUseLineScan ){
+        indicator += indicator_speed;
+        indicator %= (int)mov_w;
+        
+        if( indicator_speed!=0 && indicator/indicator_speed ){
+            int over = indicator%indicator_speed;
+            indicator -= over;
+        }
+        mov.update();
+        line_scan();
+    }else{
+        mov.update();
+        dot_scan();
     }
-    mov.update();
-    
-    scan_mov();
 }
 
-void ofApp::scan_mov(){
+void ofApp::dot_scan(){
+    
+}
+
+void ofApp::line_scan(){
     unsigned char * pixels;;
     int dot_quality = 2;
     int scan_resolution = 4;
@@ -200,11 +209,11 @@ void ofApp::scan_mov(){
         }
     }
 
-    if(bSendOsc) osc_s.sendBundle(bundle);
+    if(bSendOsc)
+        osc_s.sendBundle(bundle);
 }
 
 void ofApp::draw(){
-
     ofEnableAlphaBlending();
     ofEnableAntiAliasing();
     ofEnableSmoothing();
@@ -217,25 +226,52 @@ void ofApp::draw(){
         mov_h = img.getHeight();
     }
     
-    
-	ofPushMatrix();{
-
+    ofPushMatrix();{
+        
         if(bHorizon){
             ofTranslate(20, 20);
         }else{
             ofRotate(90, 0, 0, 1);
             ofTranslate(20, -mov_h - 20);
         }
-        
-        // Movie
-        if( bShowMov ){
-            ofSetHexColor( 0xFFFFFF );
-            if( bUseMov)
-                mov.draw( 0, 0 );
-            else
-                img.draw(0, 0);
+            
+        draw_mov();
+
+        if( bUseLineScan ){
+            draw_line_scan();
+        }else{
+            draw_dot_scan();
         }
-        
+
+        draw_info();
+    }ofPopMatrix();
+    
+    
+    mouseX = ofGetMouseX();
+    mouseY = ofGetMouseY();
+    ofCircle(mouseX, mouseY, 3, 3);
+    ofDrawBitmapString(ofToString(mouseX) + "," + ofToString(mouseY), mouseX+25, mouseY-25 );
+}
+
+void ofApp::draw_mov(){
+    
+    if( bShowMov ){
+        ofSetHexColor( 0xFFFFFF );
+        if( bUseMov)
+            mov.draw( 0, 0 );
+        else
+            img.draw(0, 0);
+    }
+}
+
+void ofApp::draw_dot_scan(){
+    
+    for (int i=0; i<dot_scan_points.size(); i++) {
+        dot_scan_points[i].draw();
+    }
+}
+
+void ofApp::draw_line_scan(){
         // indicator
         ofSetColor( 125, 125, 130 );
         ofLine( indicator, 0, indicator, mov_h+4 );
@@ -258,9 +294,9 @@ void ofApp::draw(){
 		line_vbo.updateColorData( &line_col[0], line_col.size() );
 		line_vbo.draw( GL_LINES, 0, line_pos.size() );
 		line_vbo.unbind();
-    }ofPopMatrix();
+}
 
-    // info
+void ofApp::draw_info(){
     ofPushMatrix();{
 		if(bHorizon){
 			ofTranslate( mov_w+40, mov_h+20 );
@@ -273,49 +309,6 @@ void ofApp::draw(){
         if( bSendMidi ) ofDrawBitmapString( "MIDI", 0, 60 );
         if( bSendOsc ) ofDrawBitmapString( "OSC", 0, 75 );
     }ofPopMatrix();
-}
-
-void ofApp::keyPressed(int key){
-    
-    switch(key){
-        case OF_KEY_LEFT:
-            if( ofGetKeyPressed(OF_KEY_SHIFT) ){
-                indicator_speed -= 1;
-            }else{
-                noise_threashold-=0.01;
-            }
-            break;
-
-        case OF_KEY_RIGHT:
-            if( ofGetKeyPressed(OF_KEY_SHIFT) ){
-                indicator_speed += 1;
-            }else{
-                noise_threashold += 0.01;
-            }
-            break;
-        
-        case ' ': mov.setPaused( !mov.isPaused() ); break;
-
-		case 's': bShowMov = !bShowMov; break;
-			
-		case 'd':
-            bHorizon = !bHorizon;
-            set_window_size();
-            break;
-
-        case 'o': bSendOsc = !bSendOsc; break;
-
-        case 'm': bSendMidi = !bSendMidi; break;
-            
-		default: break;
-    }
-    
-    if( 49<=key && key<=58 ){
-        int mov_now = selected_mov;
-        selected_mov = key - 49;
-        if(mov_now != selected_mov) change_mov();
-    }
-
 }
 
 void ofApp::set_window_size(){
@@ -343,8 +336,83 @@ void ofApp::change_mov(){
     }
 }
 
-void ofApp::keyReleased(int key){}
-void ofApp::windowResized(int w, int h){}
+void ofApp::mousePressed( int x, int y, int button ){
+}
+
+void ofApp::mouseReleased( int x, int y, int button ){
+    
+}
+
+void ofApp::mouseDragged( int x, int y, int button ){
+    if( !bUseLineScan ){
+        for (int i=0; i<dot_scan_points.size(); i++) {
+            dot_scan_points[i].touch( x, y, button );
+        }
+    }
+}
+
+void ofApp::keyPressed( int key ){
+    
+    switch(key){
+        case OF_KEY_LEFT:
+            if( ofGetKeyPressed(OF_KEY_SHIFT) ){
+                indicator_speed -= 1;
+            }else{
+                noise_threashold-=0.01;
+            }
+            break;
+            
+        case OF_KEY_RIGHT:
+            if( ofGetKeyPressed(OF_KEY_SHIFT) ){
+                indicator_speed += 1;
+            }else{
+                noise_threashold += 0.01;
+            }
+            break;
+            
+        case ' ':
+            mov.setPaused( !mov.isPaused() );
+            break;
+            
+		case 's':
+            bShowMov = !bShowMov;
+            break;
+			
+		case 'd':
+            bHorizon = !bHorizon;
+            set_window_size();
+            break;
+            
+        case 'o':
+            bSendOsc = !bSendOsc;
+            break;
+            
+        case 'm':
+            bSendMidi = !bSendMidi;
+            break;
+            
+        case '#':
+            bUseLineScan = !bUseLineScan;
+            break;
+            
+		default:
+            break;
+    }
+    
+    if( 49<=key && key<=58 ){
+        int mov_now = selected_mov;
+        selected_mov = key - 49;
+        if(mov_now != selected_mov) change_mov();
+    }
+    
+}
+
+void ofApp::keyReleased( int key ){
+}
+
+void ofApp::windowResized( int w, int h ){
+}
+
 void ofApp::exit(){
     midi_out.closePort();
 }
