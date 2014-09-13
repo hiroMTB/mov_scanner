@@ -42,6 +42,8 @@ xcuserdata
 *.wav
 *.mp3
 
+#img
+.png
 
 oF_v083/examples/*
 oF_v083/export/*
