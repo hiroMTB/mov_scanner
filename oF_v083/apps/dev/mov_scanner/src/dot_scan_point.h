@@ -28,7 +28,7 @@ public:
         ofSetRectMode( OF_RECTMODE_CORNER );
         
         // ch
-        ofDrawBitmapString( ofToString(ch), pos+ofVec2f(4,-10) );
+        ofDrawBitmapString( ofToString(ch+1), pos+ofVec2f(4,-10) );
     }
     
     void pressed( int x, int y, int button ){

@@ -893,7 +893,7 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_50)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_51)",
 				);
-				PRODUCT_NAME = ap;
+				PRODUCT_NAME = mov_scanner;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
